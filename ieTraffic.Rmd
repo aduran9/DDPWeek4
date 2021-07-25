@@ -1,0 +1,68 @@
+---
+title: "StartCode_1"
+author: "aduran9"
+date: "16/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Loading and preprocessing the data
+
+Data is read from online source, load the dataset placed into the working directory.
+
+```{r, message=FALSE, warning=FALSE}
+# Download and read raw data
+ieTrafficUrl <-"https://postdata.gov.co/sites/default/files/datasets/data/Monitoreo%20de%20Tr%C3%A1fico%20de%20Internet%20-%20Trafico%20Diario_116.csv"
+ieTrafficFile <- "./data/ieTraffic116.csv"
+if (!file.exists("./data")) {
+  dir.create("./data")
+}
+if (!file.exists(ieTrafficFile)) {
+  download.file(ieTrafficUrl, destfile=ieTrafficFile, method="curl")
+}
+
+# Import Dataset
+ieTrafficRaw <- read.csv("./data/ieTraffic116.csv", sep = ";", dec = ",", header=TRUE)
+
+```
+```{r}
+## How much information do we have???
+dim(ieTrafficRaw)
+
+```
+Data set contains 5752 observations and 9 variables.
+```{r}
+## Set properly if different from USA
+Sys.setlocale("LC_TIME", "English")
+
+## Load libraries
+library("ggplot2")
+
+# Change Columns titles they are too long
+col_names = c("NIT",
+              "Proveedor",
+              "TrafDate",
+              "RushHour",
+              "TrafIntNal",
+              "TrafNAPCo",
+              "TrafAcuer",
+              "TrafLocal",
+              "TrafTotal"
+              )
+colnames(ieTrafficRaw) <- col_names
+head(ieTrafficRaw)
+# Change Date format to standar view
+ieTrafficRaw$TrafDate <- format(as.Date(ieTrafficRaw$TrafDate, format = "%d/%m/%Y"), "%Y-%m-%d")
+head(ieTrafficRaw)
+```
+
+## Data preparation.
+
+Taking out the column 1 because it is not related to the model
+```{r}
+ieTrafficClean <- ieTrafficRaw[, -1]
+head(ieTrafficClean)
+write.csv(ieTrafficClean, "Traffic.csv", row.names = TRUE)
+```
